@@ -13,22 +13,43 @@ class Reader {
   }
 }
 
-const tokanize = (str) => {
+const tokenize = (str) => {
   const matcher =
     /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
   return [...str.matchAll(matcher)].slice(0, -1).map((match) => match[1]);
 };
 
+const read_atom = (reader) => {
+  const token = reader.peak();
+  if (token.match(/^\d+$/g) !== null) {
+    return parseInt(token);
+  }
+  if (token.match(/^\d+\.\d+$/g) !== null) {
+    return parseFloat(token);
+  }
+  return token;
+};
+
+const read_list = (reader) => {
+  const ast = [];
+  reader.next();
+  while (reader.peak() !== ")") {
+    ast.push(read_form(reader));
+    reader.next();
+  }
+  return ast;
+};
+
 const read_form = (reader) => {
   if (reader.peak() === "(") {
-    return "LIST";
+    return read_list(reader);
   }
-  return "Symbol";
+  return read_atom(reader);
 };
 
 const read_str = (str) => {
-  const tokans = tokanize(str);
-  const reader = new Reader(tokans);
+  const tokens = tokenize(str);
+  const reader = new Reader(tokens);
   return read_form(reader);
 };
 
