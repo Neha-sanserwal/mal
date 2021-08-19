@@ -56,15 +56,12 @@ class HashMap extends MalValue {
   }
 
   pr_str() {
-    let representaion = ``;
+    let representaion = [];
     for (const entry of this.map.entries()) {
       const [key, value] = entry;
-      representaion = representaion.concat(
-        entry.map((e) => pr_str(e)).join(" "),
-        ", "
-      );
+      representaion.push(entry.map((e) => pr_str(e)).join(" "));
     }
-    return `{${representaion}}`;
+    return `{${representaion.join(",")}}`;
   }
 }
 

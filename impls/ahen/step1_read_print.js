@@ -15,10 +15,11 @@ const main = () => {
   reader.question("user> ", (str) => {
     try {
       console.log(rep(str));
-      reader.close();
     } catch (error) {
       console.log(error);
     } finally {
+      reader.close();
+
       main();
     }
   });
