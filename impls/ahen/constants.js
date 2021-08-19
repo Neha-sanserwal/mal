@@ -8,7 +8,7 @@ const PREDEFINED_KEYWORDS = {
 
 const ENCLOSERS = {
   LIST: { start: "(", end: ")" },
-  VECTOR: { start: "(", end: ")" },
+  VECTOR: { start: "[", end: "]" },
   HASH_MAP: { start: "{", end: "}" },
   STRING: { start: `"`, end: `"` },
 };

@@ -1,0 +1,298 @@
+/Applications/Xcode.app/Contents/Developer/usr/bin/make -C impls/ahen step1_read_print.js
+make[1]: Nothing to be done for `step1_read_print.js'.
+(call STEP_TEST_FILES,ahen,step1): impls/tests/step1_read_print.mal
+----------------------------------------------
+Testing test^ahen^step1; step file: impls/ahen/step1_read_print.js, test file: tests/step1_read_print.mal
+Running: env STEP=step1_read_print MAL_IMPL=js ../../runtest.py  --deferrable --optional   ../tests/step1_read_print.mal -- ../ahen/run
+Testing read of numbers
+TEST: '1' -> ['',1] -> SUCCESS
+TEST: '7' -> ['',7] -> SUCCESS
+TEST: '  7   ' -> ['',7] -> SUCCESS
+TEST: '-123' -> ['',-123] -> SUCCESS
+Testing read of symbols
+TEST: '+' -> ['',+] -> SUCCESS
+TEST: 'abc' -> ['',abc] -> SUCCESS
+TEST: '   abc   ' -> ['',abc] -> SUCCESS
+TEST: 'abc5' -> ['',abc5] -> SUCCESS
+TEST: 'abc-def' -> ['',abc-def] -> SUCCESS
+Testing non-numbers starting with a dash.
+TEST: '-' -> ['',-] -> SUCCESS
+TEST: '-abc' -> ['',-abc] -> SUCCESS
+TEST: '->>' -> ['',->>] -> SUCCESS
+Testing read of lists
+TEST: '(+ 1 2)' -> ['',(+ 1 2)] -> SUCCESS
+TEST: '()' -> ['',()] -> SUCCESS
+TEST: '( )' -> ['',()] -> SUCCESS
+TEST: '(nil)' -> ['',(nil)] -> SUCCESS
+TEST: '((3 4))' -> ['',((3 4))] -> SUCCESS
+TEST: '(+ 1 (+ 2 3))' -> ['',(+ 1 (+ 2 3))] -> SUCCESS
+TEST: '  ( +   1   (+   2 3   )   )  ' -> ['',(+ 1 (+ 2 3))] -> SUCCESS
+TEST: '(* 1 2)' -> ['',(* 1 2)] -> SUCCESS
+TEST: '(** 1 2)' -> ['',(** 1 2)] -> SUCCESS
+TEST: '(* -3 6)' -> ['',(* -3 6)] -> SUCCESS
+TEST: '(()())' -> ['',(() ())] -> SUCCESS
+Test commas as whitespace
+TEST: '(1 2, 3,,,,),,' -> ['',(1 2 3)] -> SUCCESS
+
+-------- Deferrable Functionality --------
+Testing read of nil/true/false
+TEST: 'nil' -> ['',nil] -> SUCCESS
+TEST: 'true' -> ['',true] -> SUCCESS
+TEST: 'false' -> ['',false] -> SUCCESS
+Testing read of strings
+TEST: '"abc"' -> ['',"abc"] -> SUCCESS
+TEST: '   "abc"   ' -> ['',"abc"] -> SUCCESS
+TEST: '"abc (with parens)"' -> ['',"abc (with parens)"] -> SUCCESS
+TEST: '"abc\\"def"' -> ['',"abc\"def"] -> SUCCESS
+TEST: '""' -> ['',""] -> SUCCESS
+TEST: '"\\\\"' -> ['',"\\"] -> SUCCESS
+TEST: '"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"' -> ['',"\\\\\\\\\\\\\\\\\\"] -> SUCCESS
+TEST: '"&"' -> ['',"&"] -> SUCCESS
+TEST: '"\'"' -> ['',"'"] -> SUCCESS
+TEST: '"("' -> ['',"("] -> SUCCESS
+TEST: '")"' -> ['',")"] -> SUCCESS
+TEST: '"*"' -> ['',"*"] -> SUCCESS
+TEST: '"+"' -> ['',"+"] -> SUCCESS
+TEST: '","' -> ['',","] -> SUCCESS
+TEST: '"-"' -> ['',"-"] -> SUCCESS
+TEST: '"/"' -> ['',"/"] -> SUCCESS
+TEST: '":"' -> ['',":"] -> SUCCESS
+TEST: '";"' -> ['',";"] -> SUCCESS
+TEST: '"<"' -> ['',"<"] -> SUCCESS
+TEST: '"="' -> ['',"="] -> SUCCESS
+TEST: '">"' -> ['',">"] -> SUCCESS
+TEST: '"?"' -> ['',"?"] -> SUCCESS
+TEST: '"@"' -> ['',"@"] -> SUCCESS
+TEST: '"["' -> ['',"["] -> SUCCESS
+TEST: '"]"' -> ['',"]"] -> SUCCESS
+TEST: '"^"' -> ['',"^"] -> SUCCESS
+TEST: '"_"' -> ['',"_"] -> SUCCESS
+TEST: '"`"' -> ['',"`"] -> SUCCESS
+TEST: '"{"' -> ['',"{"] -> SUCCESS
+TEST: '"}"' -> ['',"}"] -> SUCCESS
+TEST: '"~"' -> ['',"~"] -> SUCCESS
+TEST: '"!"' -> ['',"!"] -> SUCCESS
+Testing reader errors
+TEST: '(1 2' -> ['.*(EOF|end of input|unbalanced).*',] -> SUCCESS
+TEST: '[1 2' -> ['.*(EOF|end of input|unbalanced).*',] -> FAIL (line 144):
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '[[11  22\n\n['
+TEST: '"abc' -> ['.*(EOF|end of input|unbalanced).*',] -> FAIL (line 148):
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '""aabbcc\n\n"ab"'
+TEST: '"' -> ['.*(EOF|end of input|unbalanced).*',] -> FAIL (line 150):
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '""\n\n""'
+TEST: '"\\"' -> ['.*(EOF|end of input|unbalanced).*',] -> FAIL (line 152):
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '""\\\\""\n\n"\\"'
+TEST: '"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"' -> ['.*(EOF|end of input|unbalanced).*',] -> FAIL (line 154):
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '""\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\""\n\n"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"'
+TEST: '(1 "abc' -> ['.*(EOF|end of input|unbalanced).*',] -> SUCCESS
+TEST: '(1 "abc"' -> ['.*(EOF|end of input|unbalanced).*',] -> SUCCESS
+Testing read of quoting
+TEST: "'1" -> ['',(quote 1)] -> FAIL (line 162):
+    Expected : '.*\n\\(quote\\ 1\\)'
+    Got      : "''''1111\n\n\n\n'"
+TEST: "'(1 2 3)" -> ['',(quote (1 2 3))] -> FAIL (line 164):
+    Expected : '.*\n\\(quote\\ \\(1\\ 2\\ 3\\)\\)'
+    Got      : "''''((((1111    2222    3333))))\n\n\n\n'"
+TEST: '`1' -> ['',(quasiquote 1)] -> FAIL (line 166):
+    Expected : '.*\n\\(quasiquote\\ 1\\)'
+    Got      : '````1111\n\n\n\n`'
+TEST: '`(1 2 3)' -> ['',(quasiquote (1 2 3))] -> FAIL (line 168):
+    Expected : '.*\n\\(quasiquote\\ \\(1\\ 2\\ 3\\)\\)'
+    Got      : '````((((1111    2222    3333))))\n\n\n\n`'
+TEST: '~1' -> ['',(unquote 1)] -> FAIL (line 170):
+    Expected : '.*\n\\(unquote\\ 1\\)'
+    Got      : '~~~~1111\n\n\n\n~'
+TEST: '~(1 2 3)' -> ['',(unquote (1 2 3))] -> FAIL (line 172):
+    Expected : '.*\n\\(unquote\\ \\(1\\ 2\\ 3\\)\\)'
+    Got      : '~~~~((((1111    2222    3333))))\n\n\n\n~'
+TEST: '`(1 ~a 3)' -> ['',(quasiquote (1 (unquote a) 3))] -> FAIL (line 174):
+    Expected : '.*\n\\(quasiquote\\ \\(1\\ \\(unquote\\ a\\)\\ 3\\)\\)'
+    Got      : '````((((1111    ~~~~aaaa    3333))))\n\n\n\n`'
+TEST: '~@(1 2 3)' -> ['',(splice-unquote (1 2 3))] -> FAIL (line 176):
+    Expected : '.*\n\\(splice\\-unquote\\ \\(1\\ 2\\ 3\\)\\)'
+    Got      : '~~~~@@@@((((1111    2222    3333))))\n\n\n\n~@'
+Testing keywords
+TEST: ':kw' -> ['',:kw] -> SUCCESS
+TEST: '(:kw1 :kw2 :kw3)' -> ['',(:kw1 :kw2 :kw3)] -> SUCCESS
+Testing read of vectors
+TEST: '[+ 1 2]' -> ['',[+ 1 2]] -> FAIL (line 187):
+    Expected : '.*\n\\[\\+\\ 1\\ 2\\]'
+    Got      : '[[[[++++    1111    2222]]]]\n\n\n\n['
+TEST: '[]' -> ['',[]] -> FAIL (line 189):
+    Expected : '.*\n\\[\\]'
+    Got      : '[[[[]]]]\n\n\n\n['
+TEST: '[ ]' -> ['',[]] -> FAIL (line 191):
+    Expected : '.*\n\\[\\]'
+    Got      : '[[[[    ]]]]\n\n\n\n['
+TEST: '[[3 4]]' -> ['',[[3 4]]] -> FAIL (line 193):
+    Expected : '.*\n\\[\\[3\\ 4\\]\\]'
+    Got      : '[[[[[[[[3333    4444]]]]]]]]\n\n\n\n['
+TEST: '[+ 1 [+ 2 3]]' -> ['',[+ 1 [+ 2 3]]] -> FAIL (line 195):
+    Expected : '.*\n\\[\\+\\ 1\\ \\[\\+\\ 2\\ 3\\]\\]'
+    Got      : '[[[[++++    1111    [[[[++++    2222    3333]]]]]]]]\n\n\n\n['
+TEST: '  [ +   1   [+   2 3   ]   ]  ' -> ['',[+ 1 [+ 2 3]]] -> FAIL (line 197):
+    Expected : '.*\n\\[\\+\\ 1\\ \\[\\+\\ 2\\ 3\\]\\]'
+    Got      : '        [[[[    ++++            1111            [[[[++++            2222    3333            ]]]]            ]]]]        \n\n\n\n['
+TEST: '([])' -> ['',([])] -> FAIL (line 199):
+    Expected : '.*\n\\(\\[\\]\\)'
+    Got      : '(((([[[[]]]]))))\n\n\n\n([ ])'
+Testing read of hash maps
+TEST: '{}' -> ['',{}] -> SUCCESS
+TEST: '{ }' -> ['',{}] -> SUCCESS
+TEST: '{"abc" 1}' -> ['',{"abc" 1}] -> FAIL (line 207):
+    Expected : '.*\n\\{\\"abc\\"\\ 1\\}'
+    Got      : '{{{{""""aaaabbbbcccc""""    1111}}}}\n\n\n\n{"abc" 1, }'
+TEST: '{"a" {"b" 2}}' -> ['',{"a" {"b" 2}}] -> FAIL (line 209):
+    Expected : '.*\n\\{\\"a\\"\\ \\{\\"b\\"\\ 2\\}\\}'
+    Got      : '{{{{""""aaaa""""    {{{{""""bbbb""""    2222}}}}}}}}\n\n\n\n{"a" {"b" 2, }, }'
+TEST: '{"a" {"b" {"c" 3}}}' -> ['',{"a" {"b" {"c" 3}}}] -> FAIL (line 211):
+    Expected : '.*\n\\{\\"a\\"\\ \\{\\"b\\"\\ \\{\\"c\\"\\ 3\\}\\}\\}'
+    Got      : '{{{{""""aaaa""""    {{{{""""bbbb""""    {{{{""""cccc""""    3333}}}}}}}}}}}}\n\n\n\n{"a" {"b" {"c" 3, }, }, }'
+TEST: '{  "a"  {"b"   {  "cde"     3   }  }}' -> ['',{"a" {"b" {"cde" 3}}}] -> FAIL (line 213):
+    Expected : '.*\n\\{\\"a\\"\\ \\{\\"b\\"\\ \\{\\"cde\\"\\ 3\\}\\}\\}'
+    Got      : '{{{{        """"aaaa""""        {{{{""""bbbb""""            {{{{        """"ccccddddeeee""""                    3333            }}}}        }}}}}}}}\n\n\n\n{"a" {"b" {"cde" 3, }, }, }'
+TEST: '{"a1" 1 "a2" 2 "a3" 3}' -> ['{"a([1-3])" \\1 "a(?!\\1)([1-3])" \\2 "a(?!\\1)(?!\\2)([1-3])" \\3}',] -> FAIL (line 217):
+    Expected : '.*\n{"a([1-3])" \\1 "a(?!\\1)([1-3])" \\2 "a(?!\\1)(?!\\2)([1-3])" \\3}'
+    Got      : '{{{{""""aaaa1111""""    1111    """"aaaa2222""""    2222    """"aaaa3333""""    3333}}}}\n\n\n\n{"a1" 1, "a2" 2, "a3" 3, }'
+TEST: '{  :a  {:b   {  :cde     3   }  }}' -> ['',{:a {:b {:cde 3}}}] -> FAIL (line 219):
+    Expected : '.*\n\\{\\:a\\ \\{\\:b\\ \\{\\:cde\\ 3\\}\\}\\}'
+    Got      : '{{{{        ::::aaaa        {{{{::::bbbb            {{{{        ::::ccccddddeeee                    3333            }}}}        }}}}}}}}\n\n\n\n{:a {:b {:cde 3, }, }, }'
+TEST: '{"1" 1}' -> ['',{"1" 1}] -> FAIL (line 221):
+    Expected : '.*\n\\{\\"1\\"\\ 1\\}'
+    Got      : '{{{{""""1111""""    1111}}}}\n\n\n\n{"1" 1, }'
+TEST: '({})' -> ['',({})] -> SUCCESS
+Testing read of comments
+TEST: ' ;; whole line comment (not an exception)' -> ['',] -> SUCCESS (result ignored)
+TEST: '1 ; comment after expression' -> ['',1] -> SUCCESS
+TEST: '1; comment after expression' -> ['',1] -> SUCCESS
+Testing read of @/deref
+TEST: '@a' -> ['',(deref a)] -> FAIL (line 234):
+    Expected : '.*\n\\(deref\\ a\\)'
+    Got      : '@@@@aaaa\n\n\n\n@'
+
+-------- Optional Functionality --------
+Testing read of ^/metadata
+TEST: '^{"a" 1} [1 2 3]' -> ['',(with-meta [1 2 3] {"a" 1})] -> SOFT FAIL (line 243):
+    Expected : '.*\n\\(with\\-meta\\ \\[1\\ 2\\ 3\\]\\ \\{\\"a\\"\\ 1\\}\\)'
+    Got      : '^^^^{{{{""""aaaa""""    1111}}}}    [[[[1111    2222    3333]]]]\n\n\n\n^'
+Non alphanumerice characters in strings
+TEST: '"\\n"' -> ['',"\n"] -> SUCCESS
+TEST: '"#"' -> ['',"#"] -> SUCCESS
+TEST: '"$"' -> ['',"$"] -> SUCCESS
+TEST: '"%"' -> ['',"%"] -> SUCCESS
+TEST: '"."' -> ['',"."] -> SUCCESS
+TEST: '"\\\\"' -> ['',"\\"] -> SUCCESS
+TEST: '"|"' -> ['',"|"] -> SUCCESS
+Non alphanumeric characters in comments
+TEST: '1;!' -> ['',1] -> SUCCESS
+TEST: '1;"' -> ['',1] -> SUCCESS
+TEST: '1;#' -> ['',1] -> SUCCESS
+TEST: '1;$' -> ['',1] -> SUCCESS
+TEST: '1;%' -> ['',1] -> SUCCESS
+TEST: "1;'" -> ['',1] -> SUCCESS
+TEST: '1;\\' -> ['',1] -> SUCCESS
+TEST: '1;\\\\' -> ['',1] -> SUCCESS
+TEST: '1;\\\\\\' -> ['',1] -> SUCCESS
+TEST: '1;`' -> ['',1] -> SUCCESS
+TEST: '1; &()*+,-./:;<=>?@[]^_{|}~' -> ['',1] -> SUCCESS
+
+FAILURES:
+FAILED TEST (line 144): [1 2 -> ['.*(EOF|end of input|unbalanced).*',]:
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '[[11  22\n\n['
+FAILED TEST (line 148): "abc -> ['.*(EOF|end of input|unbalanced).*',]:
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '""aabbcc\n\n"ab"'
+FAILED TEST (line 150): " -> ['.*(EOF|end of input|unbalanced).*',]:
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '""\n\n""'
+FAILED TEST (line 152): "\" -> ['.*(EOF|end of input|unbalanced).*',]:
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '""\\\\""\n\n"\\"'
+FAILED TEST (line 154): "\\\\\\\\\\\\\\\\\\\" -> ['.*(EOF|end of input|unbalanced).*',]:
+    Expected : '.*\n.*(EOF|end of input|unbalanced).*'
+    Got      : '""\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\""\n\n"\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"'
+FAILED TEST (line 162): '1 -> ['',(quote 1)]:
+    Expected : '.*\n\\(quote\\ 1\\)'
+    Got      : "''''1111\n\n\n\n'"
+FAILED TEST (line 164): '(1 2 3) -> ['',(quote (1 2 3))]:
+    Expected : '.*\n\\(quote\\ \\(1\\ 2\\ 3\\)\\)'
+    Got      : "''''((((1111    2222    3333))))\n\n\n\n'"
+FAILED TEST (line 166): `1 -> ['',(quasiquote 1)]:
+    Expected : '.*\n\\(quasiquote\\ 1\\)'
+    Got      : '````1111\n\n\n\n`'
+FAILED TEST (line 168): `(1 2 3) -> ['',(quasiquote (1 2 3))]:
+    Expected : '.*\n\\(quasiquote\\ \\(1\\ 2\\ 3\\)\\)'
+    Got      : '````((((1111    2222    3333))))\n\n\n\n`'
+FAILED TEST (line 170): ~1 -> ['',(unquote 1)]:
+    Expected : '.*\n\\(unquote\\ 1\\)'
+    Got      : '~~~~1111\n\n\n\n~'
+FAILED TEST (line 172): ~(1 2 3) -> ['',(unquote (1 2 3))]:
+    Expected : '.*\n\\(unquote\\ \\(1\\ 2\\ 3\\)\\)'
+    Got      : '~~~~((((1111    2222    3333))))\n\n\n\n~'
+FAILED TEST (line 174): `(1 ~a 3) -> ['',(quasiquote (1 (unquote a) 3))]:
+    Expected : '.*\n\\(quasiquote\\ \\(1\\ \\(unquote\\ a\\)\\ 3\\)\\)'
+    Got      : '````((((1111    ~~~~aaaa    3333))))\n\n\n\n`'
+FAILED TEST (line 176): ~@(1 2 3) -> ['',(splice-unquote (1 2 3))]:
+    Expected : '.*\n\\(splice\\-unquote\\ \\(1\\ 2\\ 3\\)\\)'
+    Got      : '~~~~@@@@((((1111    2222    3333))))\n\n\n\n~@'
+FAILED TEST (line 187): [+ 1 2] -> ['',[+ 1 2]]:
+    Expected : '.*\n\\[\\+\\ 1\\ 2\\]'
+    Got      : '[[[[++++    1111    2222]]]]\n\n\n\n['
+FAILED TEST (line 189): [] -> ['',[]]:
+    Expected : '.*\n\\[\\]'
+    Got      : '[[[[]]]]\n\n\n\n['
+FAILED TEST (line 191): [ ] -> ['',[]]:
+    Expected : '.*\n\\[\\]'
+    Got      : '[[[[    ]]]]\n\n\n\n['
+FAILED TEST (line 193): [[3 4]] -> ['',[[3 4]]]:
+    Expected : '.*\n\\[\\[3\\ 4\\]\\]'
+    Got      : '[[[[[[[[3333    4444]]]]]]]]\n\n\n\n['
+FAILED TEST (line 195): [+ 1 [+ 2 3]] -> ['',[+ 1 [+ 2 3]]]:
+    Expected : '.*\n\\[\\+\\ 1\\ \\[\\+\\ 2\\ 3\\]\\]'
+    Got      : '[[[[++++    1111    [[[[++++    2222    3333]]]]]]]]\n\n\n\n['
+FAILED TEST (line 197):   [ +   1   [+   2 3   ]   ]   -> ['',[+ 1 [+ 2 3]]]:
+    Expected : '.*\n\\[\\+\\ 1\\ \\[\\+\\ 2\\ 3\\]\\]'
+    Got      : '        [[[[    ++++            1111            [[[[++++            2222    3333            ]]]]            ]]]]        \n\n\n\n['
+FAILED TEST (line 199): ([]) -> ['',([])]:
+    Expected : '.*\n\\(\\[\\]\\)'
+    Got      : '(((([[[[]]]]))))\n\n\n\n([ ])'
+FAILED TEST (line 207): {"abc" 1} -> ['',{"abc" 1}]:
+    Expected : '.*\n\\{\\"abc\\"\\ 1\\}'
+    Got      : '{{{{""""aaaabbbbcccc""""    1111}}}}\n\n\n\n{"abc" 1, }'
+FAILED TEST (line 209): {"a" {"b" 2}} -> ['',{"a" {"b" 2}}]:
+    Expected : '.*\n\\{\\"a\\"\\ \\{\\"b\\"\\ 2\\}\\}'
+    Got      : '{{{{""""aaaa""""    {{{{""""bbbb""""    2222}}}}}}}}\n\n\n\n{"a" {"b" 2, }, }'
+FAILED TEST (line 211): {"a" {"b" {"c" 3}}} -> ['',{"a" {"b" {"c" 3}}}]:
+    Expected : '.*\n\\{\\"a\\"\\ \\{\\"b\\"\\ \\{\\"c\\"\\ 3\\}\\}\\}'
+    Got      : '{{{{""""aaaa""""    {{{{""""bbbb""""    {{{{""""cccc""""    3333}}}}}}}}}}}}\n\n\n\n{"a" {"b" {"c" 3, }, }, }'
+FAILED TEST (line 213): {  "a"  {"b"   {  "cde"     3   }  }} -> ['',{"a" {"b" {"cde" 3}}}]:
+    Expected : '.*\n\\{\\"a\\"\\ \\{\\"b\\"\\ \\{\\"cde\\"\\ 3\\}\\}\\}'
+    Got      : '{{{{        """"aaaa""""        {{{{""""bbbb""""            {{{{        """"ccccddddeeee""""                    3333            }}}}        }}}}}}}}\n\n\n\n{"a" {"b" {"cde" 3, }, }, }'
+FAILED TEST (line 217): {"a1" 1 "a2" 2 "a3" 3} -> ['{"a([1-3])" \\1 "a(?!\\1)([1-3])" \\2 "a(?!\\1)(?!\\2)([1-3])" \\3}',]:
+    Expected : '.*\n{"a([1-3])" \\1 "a(?!\\1)([1-3])" \\2 "a(?!\\1)(?!\\2)([1-3])" \\3}'
+    Got      : '{{{{""""aaaa1111""""    1111    """"aaaa2222""""    2222    """"aaaa3333""""    3333}}}}\n\n\n\n{"a1" 1, "a2" 2, "a3" 3, }'
+FAILED TEST (line 219): {  :a  {:b   {  :cde     3   }  }} -> ['',{:a {:b {:cde 3}}}]:
+    Expected : '.*\n\\{\\:a\\ \\{\\:b\\ \\{\\:cde\\ 3\\}\\}\\}'
+    Got      : '{{{{        ::::aaaa        {{{{::::bbbb            {{{{        ::::ccccddddeeee                    3333            }}}}        }}}}}}}}\n\n\n\n{:a {:b {:cde 3, }, }, }'
+FAILED TEST (line 221): {"1" 1} -> ['',{"1" 1}]:
+    Expected : '.*\n\\{\\"1\\"\\ 1\\}'
+    Got      : '{{{{""""1111""""    1111}}}}\n\n\n\n{"1" 1, }'
+FAILED TEST (line 234): @a -> ['',(deref a)]:
+    Expected : '.*\n\\(deref\\ a\\)'
+    Got      : '@@@@aaaa\n\n\n\n@'
+SOFT FAILED TEST (line 243): ^{"a" 1} [1 2 3] -> ['',(with-meta [1 2 3] {"a" 1})]:
+    Expected : '.*\n\\(with\\-meta\\ \\[1\\ 2\\ 3\\]\\ \\{\\"a\\"\\ 1\\}\\)'
+    Got      : '^^^^{{{{""""aaaa""""    1111}}}}    [[[[1111    2222    3333]]]]\n\n\n\n^'
+
+TEST RESULTS (for ../tests/step1_read_print.mal):
+    1: soft failing tests
+   28: failing tests
+   88: passing tests
+  117: total tests
+

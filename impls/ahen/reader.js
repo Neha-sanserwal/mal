@@ -33,6 +33,9 @@ const read_atom = (reader) => {
   if (token in PREDEFINED_KEYWORDS) {
     PREDEFINED_KEYWORDS[token];
   }
+  if (token.match(/^"(?:\\.|[^\\"])*$/g) !== null) {
+    return new String(token.slice(1, -1));
+  }
   return token;
 };
 
@@ -69,7 +72,6 @@ const read_form = (reader) => {
       return read_vector(reader);
     case ENCLOSERS.HASH_MAP.start:
       return read_has_map(reader);
-    default:
   }
   return read_atom(reader);
 };

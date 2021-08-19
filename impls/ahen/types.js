@@ -22,6 +22,9 @@ class Vector extends MalValue {
 }
 
 class Nil extends MalValue {
+  constructor(val) {
+    super();
+  }
   pr_str() {
     return `nil`;
   }
