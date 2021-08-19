@@ -1,4 +1,4 @@
-const { MalList, MalValue } = require("./types");
+const { List, MalValue, Vector } = require("./types");
 class Reader {
   constructor(tokens) {
     this.tokens = tokens;
@@ -41,12 +41,29 @@ const read_list = (reader) => {
     ast.push(read_form(reader));
   }
   reader.next();
-  return new MalList(ast);
+  return new List(ast);
+};
+
+const read_vector = (reader) => {
+  const ast = [];
+  reader.next();
+  while (reader.peak() !== "]") {
+    if (reader.peak() === undefined) {
+      throw "unbalanced";
+    }
+    ast.push(read_form(reader));
+  }
+  reader.next();
+  return new Vector(ast);
 };
 
 const read_form = (reader) => {
-  if (reader.peak() === "(") {
-    return read_list(reader);
+  switch (reader.peak()) {
+    case "(":
+      return read_list(reader);
+    case "[":
+      return read_vector(reader);
+    default:
   }
   return read_atom(reader);
 };
