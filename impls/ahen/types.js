@@ -21,6 +21,23 @@ class Vector extends MalValue {
   }
 }
 
+class Nil extends MalValue {
+  pr_str() {
+    return `nil`;
+  }
+}
+
+class String extends MalValue {
+  constructor(val) {
+    super();
+    this.val = val;
+  }
+
+  pr_str() {
+    return `"${this.val}"`;
+  }
+}
+
 const pr_str = (value) => {
   if (value instanceof MalValue) return value.pr_str();
   return value.toString();
@@ -54,4 +71,6 @@ module.exports = {
   Vector,
   pr_str,
   HashMap,
+  String,
+  Nil: new Nil(),
 };

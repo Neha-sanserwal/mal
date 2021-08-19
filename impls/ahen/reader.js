@@ -1,5 +1,5 @@
 const { PREDEFINED_KEYWORDS, ENCLOSERS } = require("./Constants");
-const { List, Vector, HashMap } = require("./types");
+const { List, Vector, HashMap, String } = require("./types");
 
 class Reader {
   constructor(tokens) {
@@ -33,7 +33,6 @@ const read_atom = (reader) => {
   if (token in PREDEFINED_KEYWORDS) {
     PREDEFINED_KEYWORDS[token];
   }
-
   return token;
 };
 
@@ -70,7 +69,6 @@ const read_form = (reader) => {
       return read_vector(reader);
     case ENCLOSERS.HASH_MAP.start:
       return read_has_map(reader);
-
     default:
   }
   return read_atom(reader);
