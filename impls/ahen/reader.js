@@ -1,3 +1,4 @@
+const { MalList, MalValue } = require("./types");
 class Reader {
   constructor(tokens) {
     this.tokens = tokens;
@@ -8,7 +9,7 @@ class Reader {
   }
   next() {
     const token = this.peak();
-    this.position++;
+    if (this.position < this.tokens.length) this.position++;
     return token;
   }
 }
@@ -16,11 +17,11 @@ class Reader {
 const tokenize = (str) => {
   const matcher =
     /[\s,]*(~@|[\[\]{}()'`~^@]|"(?:\\.|[^\\"])*"?|;.*|[^\s\[\]{}('"`,;)]*)/g;
-  return [...str.matchAll(matcher)].slice(0, -1).map((match) => match[1]);
+  return [...str.matchAll(matcher)].map((match) => match[1]).slice(0, -1);
 };
 
 const read_atom = (reader) => {
-  const token = reader.peak();
+  const token = reader.next();
   if (token.match(/^\d+$/g) !== null) {
     return parseInt(token);
   }
@@ -34,10 +35,13 @@ const read_list = (reader) => {
   const ast = [];
   reader.next();
   while (reader.peak() !== ")") {
+    if (reader.peak() === undefined) {
+      throw "unbalanced";
+    }
     ast.push(read_form(reader));
-    reader.next();
   }
-  return ast;
+  reader.next();
+  return new MalList(ast);
 };
 
 const read_form = (reader) => {

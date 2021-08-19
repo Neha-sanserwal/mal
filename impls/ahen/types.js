@@ -1,10 +1,17 @@
-class MalValue {
-  constructor() {}
-}
+class MalValue {}
 
-class List {
-  constructor(values) {
+class MalList extends MalValue {
+  constructor(ast) {
     super();
-    this.values = values;
+    this.ast = ast;
+  }
+
+  pr_str() {
+    return `(` + this.ast.map((x) => x.toString()).join(" ") + ")";
   }
 }
+
+module.exports = {
+  MalList,
+  MalValue,
+};
