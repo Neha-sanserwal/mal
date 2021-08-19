@@ -1,4 +1,6 @@
-const { List, MalValue, Vector } = require("./types");
+const { PREDEFINED_KEYWORDS, ENCLOSERS } = require("./Constants");
+const { List, Vector, HashMap } = require("./types");
+
 class Reader {
   constructor(tokens) {
     this.tokens = tokens;
@@ -28,41 +30,47 @@ const read_atom = (reader) => {
   if (token.match(/^\d+\.\d+$/g) !== null) {
     return parseFloat(token);
   }
+  if (token in PREDEFINED_KEYWORDS) {
+    PREDEFINED_KEYWORDS[token];
+  }
+
   return token;
 };
 
-const read_list = (reader) => {
+const read_ast = (reader, enlosure) => {
   const ast = [];
   reader.next();
-  while (reader.peak() !== ")") {
+  while (reader.peak() !== enlosure.end) {
     if (reader.peak() === undefined) {
       throw "unbalanced";
     }
     ast.push(read_form(reader));
   }
   reader.next();
-  return new List(ast);
+  return ast;
+};
+
+const read_list = (reader) => {
+  return new List(read_ast(reader, ENCLOSERS.LIST));
+};
+
+const read_has_map = (reader) => {
+  return new HashMap(read_ast(reader, ENCLOSERS.HASH_MAP));
 };
 
 const read_vector = (reader) => {
-  const ast = [];
-  reader.next();
-  while (reader.peak() !== "]") {
-    if (reader.peak() === undefined) {
-      throw "unbalanced";
-    }
-    ast.push(read_form(reader));
-  }
-  reader.next();
-  return new Vector(ast);
+  return new Vector(read_ast(reader, ENCLOSERS.VECTOR));
 };
 
 const read_form = (reader) => {
   switch (reader.peak()) {
-    case "(":
+    case ENCLOSERS.LIST.start:
       return read_list(reader);
-    case "[":
+    case ENCLOSERS.VECTOR.start:
       return read_vector(reader);
+    case ENCLOSERS.HASH_MAP.start:
+      return read_has_map(reader);
+
     default:
   }
   return read_atom(reader);

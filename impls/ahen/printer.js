@@ -1,9 +1,4 @@
-const { MalValue } = require("./types");
-
-const pr_str = (value) => {
-  if (value instanceof MalValue) return value.pr_str();
-  return value;
-};
+const { pr_str } = require("./types");
 
 module.exports = {
   pr_str,
