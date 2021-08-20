@@ -1,3 +1,7 @@
+const pr_str = (value, print_readably) => {
+  if (value instanceof MalValue) return value.pr_str(print_readably);
+  return value.toString();
+};
 class MalValue {}
 class List extends MalValue {
   constructor(ast) {
@@ -5,7 +9,7 @@ class List extends MalValue {
     this.ast = ast;
   }
 
-  pr_str() {
+  pr_str(print_readably = false) {
     return `(${this.ast.map((element) => pr_str(element)).join(" ")})`;
   }
 }
@@ -16,7 +20,7 @@ class Vector extends MalValue {
     this.ast = ast;
   }
 
-  pr_str() {
+  pr_str(print_readably = false) {
     return `[${this.ast.map((element) => pr_str(element)).join(" ")}]`;
   }
 }
@@ -25,26 +29,27 @@ class Nil extends MalValue {
   constructor(val) {
     super();
   }
-  pr_str() {
+  pr_str(print_readably = false) {
     return `nil`;
   }
 }
 
-class String extends MalValue {
+class Str extends MalValue {
   constructor(val) {
     super();
     this.val = val;
   }
 
-  pr_str() {
-    return `"${this.val}"`;
+  pr_str(print_readably = false) {
+    console.log(print_readably);
+    return print_readably
+      ? `"${this.val
+          .replace(/\\/g, "\\\\")
+          .replace(/"/g, '\\"')
+          .replace(/\n/g, "\\n")}"`
+      : `"${this.val}"`;
   }
 }
-
-const pr_str = (value) => {
-  if (value instanceof MalValue) return value.pr_str();
-  return value.toString();
-};
 
 class HashMap extends MalValue {
   constructor(ast) {
@@ -55,13 +60,32 @@ class HashMap extends MalValue {
     }
   }
 
-  pr_str() {
+  pr_str(print_readably = false) {
     let representaion = [];
     for (const entry of this.map.entries()) {
-      const [key, value] = entry;
       representaion.push(entry.map((e) => pr_str(e)).join(" "));
     }
-    return `{${representaion.join(",")}}`;
+    return `{${representaion.join(", ")}}`;
+  }
+}
+
+class Keyword extends MalValue {
+  constructor(value) {
+    super();
+    this.value = value;
+  }
+  pr_str(print_readably = false) {
+    return `:${this.value}`;
+  }
+}
+
+class Symbol extends MalValue {
+  constructor(value) {
+    super();
+    this.value = value;
+  }
+  pr_str(print_readably = false) {
+    return `${this.value}`;
   }
 }
 
@@ -71,6 +95,8 @@ module.exports = {
   Vector,
   pr_str,
   HashMap,
-  String,
+  Str,
   Nil: new Nil(),
+  Keyword,
+  Symbol,
 };

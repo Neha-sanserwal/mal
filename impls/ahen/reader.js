@@ -1,5 +1,5 @@
 const { PREDEFINED_KEYWORDS, ENCLOSERS } = require("./Constants");
-const { List, Vector, HashMap, String } = require("./types");
+const { List, Vector, HashMap, Str, Keyword, Symbol } = require("./types");
 
 class Reader {
   constructor(tokens) {
@@ -33,10 +33,20 @@ const read_atom = (reader) => {
   if (token in PREDEFINED_KEYWORDS) {
     PREDEFINED_KEYWORDS[token];
   }
-  if (token.match(/^"(?:\\.|[^\\"])*$/g) !== null) {
-    return new String(token.slice(1, -1));
+
+  if (token.startsWith(":")) {
+    return new Keyword(token.slice(1));
   }
-  return token;
+  if (token.match(/^"(?:\\.|[^\\"])*"$/)) {
+    const str = token.slice(1, -1).replace(/\\(.)/g, function (_, c) {
+      return c === "n" ? "\n" : c;
+    });
+    return new Str(str);
+  }
+  if (token.startsWith('"')) {
+    throw "unbalanced";
+  }
+  return new Symbol(token);
 };
 
 const read_ast = (reader, enlosure) => {
