@@ -4,10 +4,10 @@ const { pr_str } = require("./printer");
 const { List, Symbol, Vector, HashMap } = require("./types");
 
 const repl_env = {
-  "+": (a, b) => a + b,
-  "-": (a, b) => a - b,
-  "*": (a, b) => a * b,
-  "/": (a, b) => a / b,
+  "+": (args) => args.reduce((a, b) => a + b, 0),
+  "-": (args) => args.reduce((a, b) => a - b, 0),
+  "*": (args) => args.reduce((a, b) => a * b, 1),
+  "/": (args) => args.reduce((a, b) => a / b, 1),
 };
 
 const READ = (str) => read_str(str);
