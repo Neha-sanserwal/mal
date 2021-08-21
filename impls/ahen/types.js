@@ -9,6 +9,10 @@ class List extends MalValue {
     this.ast = ast;
   }
 
+  isEmpty() {
+    return this.ast.length === 0;
+  }
+
   pr_str(print_readably = false) {
     return `(${this.ast.map((element) => pr_str(element)).join(" ")})`;
   }
@@ -18,6 +22,10 @@ class Vector extends MalValue {
   constructor(ast) {
     super();
     this.ast = ast;
+  }
+
+  isEmpty() {
+    return this.ast.length === 0;
   }
 
   pr_str(print_readably = false) {
@@ -41,7 +49,6 @@ class Str extends MalValue {
   }
 
   pr_str(print_readably = false) {
-    console.log(print_readably);
     return print_readably
       ? `"${this.val
           .replace(/\\/g, "\\\\")
@@ -54,10 +61,7 @@ class Str extends MalValue {
 class HashMap extends MalValue {
   constructor(ast) {
     super();
-    this.map = new Map();
-    for (let pos = 0; pos < ast.length; pos = pos + 2) {
-      this.map.set(ast[pos], ast[pos + 1]);
-    }
+    this.map = ast;
   }
 
   pr_str(print_readably = false) {

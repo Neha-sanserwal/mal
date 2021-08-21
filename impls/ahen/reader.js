@@ -24,16 +24,16 @@ const tokenize = (str) => {
 
 const read_atom = (reader) => {
   const token = reader.next();
-  if (token.match(/^\d+$/g) !== null) {
+
+  if (token.match(/^-?\d+$/g) !== null) {
     return parseInt(token);
   }
-  if (token.match(/^\d+\.\d+$/g) !== null) {
+  if (token.match(/^-?\d+\.\d+$/g) !== null) {
     return parseFloat(token);
   }
   if (token in PREDEFINED_KEYWORDS) {
-    PREDEFINED_KEYWORDS[token];
+    return PREDEFINED_KEYWORDS[token];
   }
-
   if (token.startsWith(":")) {
     return new Keyword(token.slice(1));
   }
@@ -53,7 +53,7 @@ const read_ast = (reader, enlosure) => {
   const ast = [];
   reader.next();
   while (reader.peak() !== enlosure.end) {
-    if (reader.peak() === undefined) {
+    if (!reader.peak()) {
       throw "unbalanced";
     }
     ast.push(read_form(reader));
@@ -67,7 +67,12 @@ const read_list = (reader) => {
 };
 
 const read_has_map = (reader) => {
-  return new HashMap(read_ast(reader, ENCLOSERS.HASH_MAP));
+  const ast = read_ast(reader, ENCLOSERS.HASH_MAP);
+  const hashmap = new Map();
+  for (let pos = 0; pos < ast.length; pos = pos + 2) {
+    hashmap.set(ast[pos], ast[pos + 1]);
+  }
+  return new HashMap(hashmap);
 };
 
 const read_vector = (reader) => {
