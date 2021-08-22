@@ -3,7 +3,7 @@ const { Nil } = require("./types");
 const PREDEFINED_KEYWORDS = {
   true: true,
   false: false,
-  null: Nil,
+  nil: new Nil(),
 };
 
 const ENCLOSERS = {

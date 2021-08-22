@@ -27,6 +27,19 @@ repl_env.set(new Symbol("/"), (args) => {
   }
   return args.reduce((a, b) => parseInt(a) / b);
 });
+repl_env.set(new Symbol("="), (args) => {
+  if (!args.length) {
+    throw "Wrong number of args passed";
+  }
+  return args.reduce((a, b) => a === b);
+});
+
+repl_env.set(new Symbol("list"), (args) => {
+  if (!args.length) {
+    throw "Wrong number of args passed";
+  }
+  return new List(args);
+});
 
 const READ = (str) => read_str(str);
 
@@ -55,6 +68,33 @@ const EVAL = (ast, env) => {
         innerEnv.set(key, EVAL(value, innerEnv));
       }
       return EVAL(ast.ast[2], innerEnv);
+    }
+    case "do": {
+      if (ast.isEmpty()) {
+        return NilValue;
+      }
+      let evaluatedValue;
+      for (const token of ast.ast[1].ast) {
+        evaluatedValue = EVAL(token, env);
+      }
+      return evaluatedValue;
+    }
+    case "if": {
+      if (ast.ast.length < 3 || ast.ast.length > 4) {
+        throw new Error("wrong number of arguments for if");
+      }
+      const [condition, expForTrue, expForFalse] = ast.ast.slice(1);
+      const result = EVAL(condition, env);
+      if (result instanceof Nil || result === false) {
+        return expForFalse ? EVAL(expForFalse, env) : NilValue;
+      }
+      return EVAL(expForTrue, env);
+    }
+    case "fn*": {
+      return ([...exprs]) => {
+        const innerEnv = Env.createEnv(env, ast.ast[1].ast, exprs);
+        return EVAL(ast.ast[2], innerEnv);
+      };
     }
     default: {
       const [fn, ...args] = eval_ast(ast, env).ast;

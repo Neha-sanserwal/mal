@@ -100,7 +100,7 @@ module.exports = {
   pr_str,
   HashMap,
   Str,
-  Nil: new Nil(),
+  Nil,
   Keyword,
   Symbol,
 };
