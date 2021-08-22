@@ -93,6 +93,17 @@ class Symbol extends MalValue {
   }
 }
 
+class Fn extends MalValue {
+  constructor(binds, fnBody, env) {
+    this.binds = binds;
+    this.fnBody = fnBody;
+    this.env = env;
+  }
+  pr_str(print_readably = false) {
+    return `#<function>`;
+  }
+}
+
 module.exports = {
   List,
   MalValue,
@@ -103,4 +114,5 @@ module.exports = {
   Nil,
   Keyword,
   Symbol,
+  Fn,
 };
